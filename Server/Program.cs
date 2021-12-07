@@ -15,6 +15,12 @@ namespace Server
         private const string serializedOutput = @"{""SumResult"":30.30,""MulResult"":4,""SortedInputs"":[1.0,1.01,2.02,4.0]}";
         public static void Main(string[] args)
         {
+            /*string type = Console.ReadLine();
+            string serialized = Console.ReadLine();
+            DataSerializer ds2 = new DataSerializer(type);
+            Console.WriteLine(ds2.GetAnswer(serialized));
+
+            */
             HttpListener listener = new HttpListener();
             listener.Prefixes.Add("http://127.0.0.1:4000/");
             listener.Start();
@@ -44,11 +50,15 @@ namespace Server
                     break;
 
                 case "/WriteAnswer":
-                    string body = context.Request.QueryString["answer"].Trim('"');
-                    Console.WriteLine($"Ответ с клиента: {body}");
+                    using (var reader = new StreamReader(context.Request.InputStream, context.Request.ContentEncoding))
+                    {
+                        res = reader.ReadToEnd();
+                    }
+                    Console.WriteLine($"Пришёл с клиента input: {res}  \n");
+                    Console.WriteLine($"Ответ с клиента: {res}");
                     Console.WriteLine($"Правильный ответ: {serializedOutput}\n");
 
-                    if (body == serializedOutput)
+                    if (res == serializedOutput)
                         responseString = @"{""answer"": true}";
                     else
                         responseString = @"{""answer"": false}";

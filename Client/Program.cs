@@ -25,11 +25,12 @@ namespace Client
                 string input_serialized = responseBody;
                 string output_serialized = ds.GetAnswer(responseBody);
 
-                response = await client.GetAsync($"http://127.0.0.1:4000/WriteAnswer?answer=\"{output_serialized}\"");
+                var byteContent = new ByteArrayContent(System.Text.Encoding.UTF8.GetBytes(output_serialized));
+                response = await client.PostAsync("http://127.0.0.1:4000/WriteAnswer", byteContent);
                 response.EnsureSuccessStatusCode();
-                Console.WriteLine($"Cерверу отправлен output: {output_serialized}\n");
+                Console.WriteLine($"Серверу отправлен /WriteAnswer c {output_serialized}\n");
 
-                var byteContent = new ByteArrayContent(System.Text.Encoding.UTF8.GetBytes(input_serialized));
+                byteContent = new ByteArrayContent(System.Text.Encoding.UTF8.GetBytes(input_serialized));
                 response = await client.PostAsync("http://127.0.0.1:4000/PostInputData", byteContent);
                 response.EnsureSuccessStatusCode();
                 Console.WriteLine($"Серверу отправлен /PostInputData c {input_serialized}\n");
